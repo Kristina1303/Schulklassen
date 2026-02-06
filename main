@@ -1,0 +1,159 @@
+#include <iostream>
+#include <string>
+#include <vector>
+#include "pupil.h"
+#include "form.h"
+
+using namespace std;
+
+int main() {
+try {
+  cout << "Class Pupil:\n";
+  try {
+    const Pupil p{"",Elective::M,Elective::E,5};
+    cout << "error 1" << p << '\n';
+  }
+  catch (runtime_error& e) {
+    cout << "catch 1\n";
+  }
+  try {
+    const Pupil p{"Eric",Elective::M,Elective::M,5};
+    cout << "error 2" << p << '\n';
+  }
+  catch (runtime_error& e) {
+    cout << "catch 2\n";
+  }
+  try {
+    const Pupil p{"Eric",Elective::ART,Elective::M,5};
+    cout << "error 3" << p << '\n';
+  }
+  catch (runtime_error& e) {
+    cout << "catch 3\n";
+  }
+  try {
+    const Pupil p{"Eric",Elective::M,Elective::PHIL,-1};
+    cout << "error 4" << p << '\n';
+  }
+  catch (runtime_error& e) {
+    cout << "catch 4\n";
+  }
+  try {
+    const Pupil p{"Eric",Elective::M,Elective::PHIL,101};
+    cout << "error 5" << p << '\n';
+  }
+  catch (runtime_error& e) {
+    cout << "catch 5\n";
+  }
+
+  const vector<Elective> possible{Elective::E,Elective::M,Elective::ART,Elective::PH,Elective::PHIL,Elective::CH};
+  const vector<Pupil> vp{{"Charles",Elective::M},{"Susan",Elective::M,Elective::PHIL,70},
+                              {"Richard",Elective::E,Elective::M},{"Anne",Elective::PH},
+                              {"Karen",Elective::CH,Elective::ART},{"Bob",Elective::CH},
+                              {"Mary",Elective::PH,Elective::ART,30}, {"Peter",Elective::M,Elective::CH,100}};
+
+  for (const auto& p : vp)
+    cout << p << '\n';
+  cerr << vp.at(2) << '\n';
+  cout << '\n';
+  
+  for (const auto& p: vp)
+    cout << p.get_points() << ' ';
+  cout << '\n';
+
+  Pupil p1{vp.at(5)}, p2{vp.at(3)};
+  for (const auto& c : possible) {
+    try {
+      p1.elect(c,true);
+    }
+    catch (runtime_error& e) {
+      cout << "cannot change elective1 ";
+    }
+    cout << p1 << '\n';
+    try {
+    p2.elect(c,false);
+    }
+    catch (runtime_error& e) {
+      cout << "cannot change elective2 ";
+    }
+    cout << p2 << '\n';
+  }
+  cout << '\n';
+
+  cout << p1.change_points(-50) << ' ';
+  cout << p1.change_points(70) << ' ';
+  cout << p1.change_points(50) << ' ';
+  cout << p1.change_points(-42) << ' ';
+  cout << '\n' << p1 << '\n';
+
+  cout << "\nClass Form:\n";
+  try {
+    const Form f{"",vp};
+    cout << "error 6" << f << '\n';
+  }
+  catch (runtime_error& e) {
+    cout << "catch 6\n";
+  }
+  try {
+    const Form f{"empty class",{}};
+    cout << "error 7" << f << '\n';
+  }
+  catch (runtime_error& e) {
+    cout << "catch 7\n";
+  }
+
+  const Form f1{"4d",vp};
+  cout << f1 << '\n';
+  cerr << f1 << '\n';
+  
+  Form f1_var{f1};
+
+  for (const auto& c : possible) {
+    for (const auto& val : vector<int>{0,20,50,100})
+      cout << f1.perc(c, val) << ' ';
+    cout << '\n';
+  }
+  cout << '\n';
+
+  const Form f2{"5c",vector<Pupil>{vp.at(1), vp.at(2), vp.at(6), vp.at(7)}};
+  Form f2_var{f2};
+
+  for (const auto& c : possible) {
+    for (const auto& val : vector<int>{10,30,60,90})
+      cout << f2.perc(c, val) << ' ';
+    cout << '\n';
+  }
+
+
+  cout << "\nAdditional task popular:\n{";
+  for (const auto& c : f1.popular())
+    cout << elective_names.at(static_cast<size_t>(c)) << ' ';
+  cout << "}\n{";
+  for (const auto& c : f2.popular())
+    cout << elective_names.at(static_cast<size_t>(c)) << ' ';
+  cout << "}\n{";
+  for (const auto& c : Form{"test",vector<Pupil>{{"Karen",Elective::CH,Elective::ART},{"Bob",Elective::CH},
+                              {"Mary",Elective::PH,Elective::ART,30}, {"Peter",Elective::CH,Elective::ART,100}}}.popular())
+    cout << elective_names.at(static_cast<size_t>(c)) << ' ';
+  cout << "}\n";
+
+
+  cout << "\nAdditional task distribute:\n";
+  cout << f1_var.distribute(Elective::M, 103) << '\n';
+  cout << f1_var << '\n';
+  cout << f1_var.distribute(Elective::PHIL,84) << '\n';
+  cout << f1_var << '\n';
+  cout << f2_var.distribute(Elective::M, 103) << '\n';
+  cout << f2_var << '\n';
+  cout << f2_var.distribute(Elective::E, 0) << '\n';
+  cout << f2_var << '\n';
+  
+}
+
+catch (exception& e) {
+  cout << "Unexpected exception: " << e.what() << '\n';
+}
+catch (...) {
+  cout << "Non standard exception thrown!";
+}
+return 0;
+}
